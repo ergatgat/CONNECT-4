@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>connectFour</title>
+    <link rel="stylesheet" href="projectStyle.css">
+    <script src="main.js"></script>
+    <script src="client_tools.js "></script>
+    <script>
+
+        //משחק זה תומך בניצחון בעמודות/שורות/אלכסונים
+        //וכן במצב שאין מנצח.
+
+        let board, board1, base, cell, massage;
+        let winner;
+        let a1, a2, player1, player2;
+        let startBut, msg_game_id;
+        let gameid = 0;
+        let player1Turn = true;
+        let player2Turn = false;
+        let cellsArr = [];
+        let signArr = [[], [], [], [], [], [], []];
+        function init() {
+            board1 = document.getElementById("board1");
+            board = document.getElementById("board");
+            base = document.getElementById("base");
+            massage = document.getElementById("massage");
+            msg_game_id = document.getElementById("msg_game_id");
+            msg_game_id.innerHTML = "game #" + gameid;
+            startBut = document.getElementById("startBut");
+            for (j = 0; j < 42; j++) {
+                cell = document.createElement("div");
+                cell.className = "cellStyle";
+                board.appendChild(cell);
+                cellsArr.push(cell);
+                cell.onclick = cellClicked;
+                cell.innerHTML = j;
+            }
+            for (j = 0; j < 6; j++) {
+                for (i = 0; i < 7; i++) {
+                    signArr[i].push("0");
+                }
+            }
+        }
+
+        function cellClicked(event) {
+            let i = event.target.innerHTML;
+            let columI = col(i);
+            let rowI = row(i);
+            //console.log("colum i=" + columI);
+            //console.log("row i=" + rowI);
+            let emptyCell = signArr[columI].lastIndexOf("0");
+            let fillEmptyCell = 7 * (emptyCell) + columI;
+            //console.log("fillEmptyCell=" + fillEmptyCell);
+            if (player1Turn) {
+                cellsArr[fillEmptyCell].style.backgroundColor = "blue";
+                signArr[columI][emptyCell] = "1";
+                player1Turn = false;
+                winGame(signArr);
+            } else {
+                cellsArr[fillEmptyCell].style.backgroundColor = "red";
+                signArr[columI][emptyCell] = "2";
+                player2Turn = false;
+                player1Turn = true;
+                winGame(signArr);
+            }
+        }
+
+        function row(i) {
+            if (i > 41) { return };
+            return (i - i % 7) / 7;
+        }
+
+        function col(i) {
+            if (i > 41) { return };
+            return (i % 7);
+        }
+
+        function showClass(element) {
+            let shown = document.getElementsByClassName('shown');
+            element.classList.remove("hidden");
+            element.classList.add("shown");
+        }
+
+        function hideClass(element) {
+            let hidden = document.getElementsByClassName('hidden');
+            element.classList.remove("shown");
+            element.classList.add("hidden");
+
+        }
+
+        function startGame() {
+            massage.innerHTML = "who is the winner?";
+            startBut.innerHTML = "play";
+            startBut.style.backgroundColor = "gray";
+            startBut.disabled = true;
+            a1 = document.getElementById("player1");
+            a2 = document.getElementById("player2");
+            player1 = a1.value;
+            player2 = a2.value;
+            console.log("players:" + player1, player2);
+            gameid++;
+            msg_game_id.innerHTML = "game #" + gameid;
+            showClass(board);
+            showClass(base);
+
+        }
+
+        function createCells() {
+            for (j = 0; j < 42; j++) {
+                cellsArr[j].style.backgroundColor = "rgb(255, 235, 205)";
+            }
+        }
+
+        function restartsignArr() {
+            for (j = 0; j < 6; j++) {
+                for (i = 0; i < 7; i++) {
+                    signArr[i][j] = "0";
+                }
+            }
+        }
+
+
+        function winGame(arr) {
+            massage.innerHTML = "who is the winner?";
+            //ניצחון בשורה
+            for (j = 0; j < 7; j++) {
+                for (i = 0; i < 3; i++) {
+
+                    if ((arr[j][i] == 1 & arr[j][i + 1] == 1 & arr[j][i + 2] == 1 & arr[j][i + 3] == 1)) {
+                        winner = player1;
+                        setTimeout(afterWin, 800);
+                        return;
+
+                    } if ((arr[j][i] == 2 & arr[j][i + 1] == 2 & arr[j][i + 2] == 2 & arr[j][i + 3] == 2)) {
+                        winner = player2;
+                        setTimeout(afterWin, 800);
+                        return;
+                    }
+                }
+            }
+            //ניצחון בטור
+            for (i = 0; i < 6; i++) {
+                for (j = 0; j < 4; j++) {
+                    if ((arr[j][i] == 1) & (arr[j + 1][i] == 1) & (arr[j + 2][i] == 1) & (arr[j + 3][i] == 1)) {
+                        winner = player1;
+                        setTimeout(afterWin, 800);
+                        return;
+                    }
+                    if ((arr[j][i] == 2) & (arr[j + 1][i] == 2) & (arr[j + 2][i] == 2) & (arr[j + 3][i] == 2)) {
+                        winner = player2;
+                        setTimeout(afterWin, 800);
+                        return;
+
+                    }
+                }
+            }
+            //אלכסון יורד
+            for (j = 0; j < 3; j++) {
+                for (i = 0; i < 4; i++) {
+                    if ((arr[j][i] == 1) & (arr[j][i] == arr[j + 1][i + 1]) & (arr[j][i] == arr[j + 2][i + 2]) & (arr[j][i] == arr[j + 3][i + 3])) {
+                        winner = player1;
+                        setTimeout(afterWin, 800);
+                        return;
+                    }
+                    if ((arr[j][i] == 2) & (arr[j][i] == arr[j + 1][i + 1]) & (arr[j][i] == arr[j + 2][i + 2]) & (arr[j][i] == arr[j + 3][i + 3])) {
+                        winner = player2;
+                        setTimeout(afterWin, 800);
+                        return;
+                    }
+                }
+            }
+
+            //אלכסון עולה
+            for (j = 0; j < 3; j++) {
+                for (i = 5; i > 2; i--) {
+                    if ((arr[j][i] == 1) & (arr[j][i] == arr[j + 1][i - 1]) & (arr[j][i] == arr[j + 2][i - 2]) & (arr[j][i] == arr[j + 3][i - 3])) {
+                        winner = player1;
+                        setTimeout(afterWin, 800);
+                        return;
+                    }
+                    if ((arr[j][i] == 2) & (arr[j][i] == arr[j + 1][i - 1]) & (arr[j][i] == arr[j + 2][i - 2]) & (arr[j][i] == arr[j + 3][i - 3])) {
+                        winner = player2;
+                        setTimeout(afterWin, 800);
+                        return;
+                    }
+                }
+            }
+            checkNoWinner();
+        }
+
+
+        function afterWin() {
+            massage.innerHTML = winner + " is the winner!";
+            a1.value = "";
+            a2.value = "";
+            startBut.disabled = false;
+            startBut.style.backgroundColor = "aqua";
+            startBut.innerHTML = "input your names and click";
+
+            //sends the server: who is the winner
+            sendHttpGetRequest("api/find_winner?winner=" + winner + '&player1=' + player1 + '&player2=' + player2 + '&gameid=' + gameid, (res) => {
+                if (res == "ok") {
+                    console.log("the winner is: " + winner, player1, player2 + " id=" + gameid);
+                    createCells();
+                    restartsignArr();
+                    hideClass(board);
+                    hideClass(base);
+                }
+            });
+        }
+
+        //משחק ללא מנצח
+        function checkNoWinner() {
+            for (j = 0; j < 6; j++) {
+                for (i = 0; i < 7; i++) {
+                    if (signArr[j][i] == 0)
+                        return;
+                }
+            }
+            winner = "no winner";
+            setTimeout(afterWin, 400);
+        }
+
+
+
+    </script>
+</head>
+
+<body onload="init()" style="background-color:blanchedalmond;">
+    <h1 style="text-align:center; color: blueviolet;">Connect-Four</h1>
+    <button id="startBut" onclick="startGame()" ;>input your names and click</button>
+    <div id="board1" ;>
+        <div id="board" class="hidden"></div>
+        <div id="base" class="hidden"></div>
+        <p id="massage" class="shown" ;> Who is the winner? </p>
+        <p id="msg_game_id"></p>
+        <div id="signPlayers">
+            <p>player1:<input type="text" id="player1" /></p>
+            <p>player2:<input type="text" id="player2" /></p>
+        </div>
+    </div>
+</body>
+
+</html>
